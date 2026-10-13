@@ -1,0 +1,722 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VICPOWERS HUB — Gaming Dashboard</title>
+<style>
+:root{
+  --bg:#070b14;--panel:#101827;--panel2:#151f31;--panel3:#1a2940;
+  --blue:#328bff;--cyan:#47e0ff;--purple:#9b7bff;--gold:#ffd166;
+  --green:#62edb1;--red:#ff879d;--text:#f1f6ff;--muted:#91a2bd;
+  --border:#25344c;--radius:19px
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  background:radial-gradient(ellipse at 70% -10%,#16345b 0,transparent 36%),
+             radial-gradient(ellipse at 0% 45%,#111c35 0,transparent 38%),var(--bg);
+  font-family:Inter,"Segoe UI",Arial,sans-serif
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;font-weight:750;transition:transform .18s,border-color .18s,filter .18s}
+button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.primary{color:#07111f;background:linear-gradient(110deg,#3a91ff,#4ce1ff);box-shadow:0 5px 20px #328bff25}
+.secondary{color:var(--text);background:#1b2940;border:1px solid #30435f}
+.danger{color:#ffc2cd;background:#422334;border:1px solid #673347}
+.mini{padding:7px 10px;font-size:12px}
+input,textarea,select{width:100%;background:#0a1220;color:var(--text);border:1px solid var(--border);border-radius:11px;padding:12px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #47e0ff12}
+textarea{resize:vertical;min-height:75px}
+label{display:block;color:var(--muted);font-size:13px;margin:13px 0 6px}
+header{
+  position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:15px clamp(14px,3vw,40px);background:#080d18eF;backdrop-filter:blur(18px);
+  border-bottom:1px solid #263750
+}
+.logo{font-size:21px;font-weight:950;letter-spacing:1.5px;white-space:nowrap}
+.logo span{color:var(--cyan)}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.coins{padding:10px 13px;border-radius:12px;border:1px solid #62502b;background:#272316;color:var(--gold);font-weight:850;white-space:nowrap}
+.layout{display:grid;grid-template-columns:205px minmax(0,1fr);gap:24px;max-width:1580px;margin:auto;padding:26px clamp(12px,3vw,38px)}
+nav{position:sticky;top:88px;align-self:start;display:flex;flex-direction:column;gap:8px}
+.navbtn{background:transparent;color:var(--muted);border:1px solid transparent;text-align:left;padding:13px 14px}
+.navbtn:hover,.navbtn.active{background:linear-gradient(110deg,#18345a,#142139);color:#fff;border-color:#315985}
+.navbtn.active{box-shadow:inset 3px 0 var(--cyan)}
+main{min-width:0}
+.page{display:none}.page.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+h1{font-size:clamp(28px,4vw,42px);line-height:1.12;letter-spacing:-1.1px;margin:8px 0 12px}
+h2{font-size:21px;margin:0 0 15px;letter-spacing:-.3px}
+h3{font-size:16px;margin:0 0 8px}
+p{line-height:1.55}.muted{color:var(--muted)}
+.eyebrow{font-size:11px;color:var(--cyan);font-weight:900;letter-spacing:2px;text-transform:uppercase}
+.hero{
+  position:relative;overflow:hidden;padding:clamp(22px,4vw,38px);border-radius:25px;
+  background:linear-gradient(120deg,#172f50 0%,#111c31 53%,#1c1737 100%);
+  border:1px solid #355071;margin-bottom:20px;box-shadow:0 15px 50px #0002
+}
+.hero:before{content:"";position:absolute;width:280px;height:280px;right:-80px;top:-140px;border-radius:50%;background:#438dff1b;filter:blur(4px)}
+.hero:after{content:"";position:absolute;width:160px;height:160px;right:90px;bottom:-130px;border-radius:50%;background:#a17aff20}
+.hero>*{position:relative;z-index:1}
+.hero h1 span{color:var(--cyan)}
+.hero-copy{max-width:650px;color:#b5c5dd}
+.hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:22px;flex-wrap:wrap;margin-top:22px}
+.hero-progress{width:min(100%,440px)}
+.level-orb{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;text-align:center;flex-shrink:0;background:radial-gradient(circle,#213e66,#101a2b 70%);border:2px solid #4bdfff;box-shadow:0 0 28px #43d9ff20}
+.level-orb strong{font-size:25px;display:block}.level-orb small{font-size:10px;letter-spacing:1px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:#1b2e49;color:#c3e8ff;font-size:12px;font-weight:800;border:1px solid #2c4564}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.card{
+  min-width:0;padding:18px;border-radius:var(--radius);
+  background:linear-gradient(145deg,#131e30,#0e1624);
+  border:1px solid var(--border);box-shadow:0 8px 24px #00012
+}
+.card:hover{border-color:#344b6b}
+.stat-card{position:relative;overflow:hidden;min-height:125px}
+.stat-card:after{content:attr(data-symbol);position:absolute;right:13px;bottom:4px;font-size:46px;opacity:.12;pointer-events:none}
+.stat-label{color:var(--muted);font-size:13px}
+.stat{font-size:clamp(26px,3vw,34px);font-weight:950;letter-spacing:-1px;margin:11px 0 5px}
+.stat-note{font-size:12px;color:var(--muted)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:26px 0 14px}
+.section-head h2{margin:0}
+.bar{height:9px;background:#27364d;border-radius:30px;overflow:hidden;margin:10px 0}
+.bar span{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:30px;transition:width .35s}
+.item-list{display:grid;gap:10px}
+.list-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;background:#101a2a;border:1px solid var(--border);border-radius:13px}
+.item-info{min-width:0;overflow-wrap:anywhere}.item-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.item-actions button{white-space:nowrap}.empty{text-align:center;padding:28px 14px;color:var(--muted);border:1px dashed #34445d;border-radius:14px;line-height:1.6}
+.quick-card{display:flex;align-items:center;gap:14px;text-align:left;width:100%;height:100%;padding:18px;background:linear-gradient(140deg,#17263d,#101827);color:var(--text);border:1px solid #2b3d56;border-radius:17px}
+.quick-card:hover{border-color:var(--cyan)}
+.quick-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;flex-shrink:0;background:#1c3555}
+.quick-text{flex:1;min-width:0}.quick-text strong{display:block;margin-bottom:4px}.quick-text small{color:var(--muted);font-size:12px}
+.quick-arrow{color:var(--cyan);font-size:20px}
+.activity-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#1b2b43;font-size:19px;flex-shrink:0}
+.activity{display:flex;align-items:center;gap:12px;min-width:0}
+.profile-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.avatar{width:84px;height:84px;display:grid;place-items:center;border-radius:22px;background:linear-gradient(145deg,#1d4c83,#101b31);border:2px solid #42c9ff;font-size:42px;flex-shrink:0}
+.profile-title{color:var(--cyan);font-weight:800}
+.reward-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.reward{display:flex;flex-direction:column;gap:10px}
+.reward-icon{height:90px;display:grid;place-items:center;background:linear-gradient(145deg,#172a45,#0b1424);border:1px solid #2c4565;border-radius:13px;font-size:39px}
+.reward .description{color:var(--muted);font-size:13px;line-height:1.5;flex:1}
+.reward .price{color:var(--gold);font-weight:900}
+.reward.owned{border-color:#2d8b77}.reward.equipped{border-color:var(--cyan);box-shadow:0 0 0 1px #43d9ff30}
+.trophy{display:flex;gap:12px;align-items:center}.trophy-icon{font-size:28px}.locked{filter:grayscale(1);opacity:.55}
+hr{border:0;border-top:1px solid var(--border);margin:18px 0}
+small{color:var(--muted)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2e46;border:1px solid #3d6b90;color:white;padding:13px 18px;border-radius:12px;box-shadow:0 8px 30px #0008;z-index:99;max-width:90vw;text-align:center}
+.toast.hidden{display:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.history-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center}
+.history-icon{width:40px;height:40px;border-radius:12px;background:#1b2b43;display:grid;place-items:center;font-size:20px}
+.history-title{font-weight:750}.history-detail{color:var(--muted);font-size:12px;margin-top:4px}
+.history-amount{font-weight:850;text-align:right;white-space:nowrap}.positive{color:var(--green)}.negative{color:var(--red)}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-btn{background:#1b2b43;color:var(--muted);border:1px solid #304057;padding:8px 12px}
+.filter-btn.active{background:#17375b;color:#fff;border-color:#328bff}
+@media(max-width:950px){
+ .layout{grid-template-columns:1fr}
+ nav{position:static;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+ .navbtn{text-align:center;padding:10px 5px;font-size:12px}
+ .grid,.reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+ header{padding:13px;align-items:flex-start;flex-direction:column}
+ .layout{padding:16px 12px}
+ .grid,.two,.reward-grid{grid-template-columns:1fr}
+ nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero{padding:22px}.hero-bottom{align-items:flex-start}
+ .level-orb{width:74px;height:74px}
+ .form-row{grid-template-columns:1fr}
+ .list-item{align-items:flex-start;flex-direction:column}
+ .history-row{grid-template-columns:34px minmax(0,1fr)}
+ .history-icon{width:34px;height:34px}
+ .history-amount{grid-column:2;text-align:left}
+ .header-right{width:100%;justify-content:space-between}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">VICPOWERS <span>HUB</span></div>
+  <div class="header-right">
+    <div class="coins">🪙 <span id="headerCoins">0</span> pièces</div>
+    <button class="primary" onclick="showPage('shop')">🛒 Boutique</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav>
+  <button class="navbtn active" data-page="home" onclick="showPage('home')">🏠 Accueil</button>
+  <button class="navbtn" data-page="library" onclick="showPage('library')">🎮 Bibliothèque</button>
+  <button class="navbtn" data-page="goals" onclick="showPage('goals')">🎯 Objectifs</button>
+  <button class="navbtn" data-page="trophies" onclick="showPage('trophies')">🏆 Trophées</button>
+  <button class="navbtn" data-page="shop" onclick="showPage('shop')">🛒 Boutique</button>
+  <button class="navbtn" data-page="history" onclick="showPage('history')">📜 Historique</button>
+  <button class="navbtn" data-page="profile" onclick="showPage('profile')">👤 Profil</button>
+</nav>
+
+<main>
+<!-- ACCUEIL PREMIUM -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="eyebrow">✦ Ton univers gaming personnel</div>
+    <h1>Prêt à jouer, <span id="welcomeName">V1CTOR</span> ?</h1>
+    <p class="hero-copy">Bienvenue dans ton QG. Suis ta progression, développe ta collection et débloque de nouvelles récompenses.</p>
+    <div class="badge-row">
+      <span class="pill" id="homeRank">Rang Recrue</span>
+      <span class="pill" id="homeLevel">Niveau 1</span>
+    </div>
+    <div class="hero-bottom">
+      <div class="hero-progress">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+          <strong>⚡ Progression du niveau</strong><small id="xpText">0 / 100 XP</small>
+        </div>
+        <div class="bar"><span id="xpBar" style="width:0%"></span></div>
+        <small id="xpRemaining">Encore 100 XP pour le niveau suivant</small>
+      </div>
+      <div class="level-orb"><div><small>NIVEAU</small><strong id="heroLevelNumber">1</strong></div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card stat-card" data-symbol="🎮">
+      <div class="stat-label">🎮 Ma bibliothèque</div>
+      <div class="stat" id="statGames">0</div>
+      <div class="stat-note" id="statGamesNote">Jeux enregistrés</div>
+    </div>
+    <div class="card stat-card" data-symbol="🎯">
+      <div class="stat-label">🎯 Objectifs terminés</div>
+      <div class="stat" id="statGoals">0</div>
+      <div class="stat-note" id="statGoalsNote">0 en cours</div>
+    </div>
+    <div class="card stat-card" data-symbol="🏆">
+      <div class="stat-label">🏆 Trophées débloqués</div>
+      <div class="stat" id="statTrophies">0/8</div>
+      <div class="stat-note">Continue à progresser !</div>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>⚡ Accès rapide</h2><small>Ton HUB, tes règles</small></div>
+  <div class="two">
+    <button class="quick-card" onclick="showPage('library')">
+      <span class="quick-icon">🎮</span><span class="quick-text"><strong>Ma bibliothèque</strong><small>Gérer tes jeux et favoris</small></span><span class="quick-arrow">↗</span>
+    </button>
+    <button class="quick-card" onclick="showPage('goals')">
+      <span class="quick-icon">🎯</span><span class="quick-text"><strong>Mes objectifs</strong><small>Passer au niveau supérieur</small></span><span class="quick-arrow">↗</span>
+    </button>
+    <button class="quick-card" onclick="showPage('shop')">
+      <span class="quick-icon">🛒</span><span class="quick-text"><strong>Boutique de récompenses</strong><small>Dépenser tes pièces gagnées</small></span><span class="quick-arrow">↗</span>
+    </button>
+    <button class="quick-card" onclick="showPage('profile')">
+      <span class="quick-icon">👤</span><span class="quick-text"><strong>Mon profil gamer</strong><small>Personnaliser ton identité</small></span><span class="quick-arrow">↗</span>
+    </button>
+  </div>
+
+  <div class="section-head"><h2>🎮 Jeux récemment ajoutés</h2><button class="secondary mini" onclick="showPage('library')">Toute la bibliothèque ↗</button></div>
+  <div id="recentGames" class="item-list"></div>
+
+  <div class="section-head"><h2>🏆 Ma progression</h2><button class="secondary mini" onclick="showPage('trophies')">Voir les trophées ↗</button></div>
+  <div class="two">
+    <div class="card">
+      <div class="eyebrow">Collection de succès</div>
+      <h3 style="margin-top:9px">Tes trophées</h3>
+      <div style="display:flex;align-items:baseline;gap:7px;margin:12px 0"><strong style="font-size:30px" id="homeTrophyProgress">0/8</strong><small>débloqués</small></div>
+      <div class="bar"><span id="homeTrophyBar" style="width:0%"></span></div>
+      <p class="muted" style="font-size:13px;margin-bottom:0">Chaque action compte dans ta progression.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Ton rang actuel</div>
+      <h3 style="margin-top:9px" id="homeRankCard">Recrue</h3>
+      <div style="font-size:28px;margin:10px 0">⚡ <strong id="homeXPNumber">0</strong> <small>XP totale</small></div>
+      <p class="muted" style="font-size:13px;margin-bottom:0" id="homeRankTip">Continue tes objectifs pour progresser.</p>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>📡 Dernières activités</h2><button class="secondary mini" onclick="showPage('history')">Ouvrir le journal ↗</button></div>
+  <div id="homeHistory" class="item-list"></div>
+</section>
+
+<section class="page" id="page-library">
+  <div class="eyebrow">Collection personnelle</div><h1>🎮 Ma bibliothèque</h1>
+  <p class="muted">Tous tes jeux réunis au même endroit.</p>
+  <div class="card">
+    <h2>Ajouter un jeu</h2>
+    <form id="gameForm">
+      <label for="gameName">Nom du jeu</label><input id="gameName" required maxlength="70" placeholder="Ex. Fortnite">
+      <div class="form-row">
+        <div><label for="gamePlatform">Plateforme</label><select id="gamePlatform"><option>PC</option><option>PS5</option><option>Xbox</option><option>Switch</option><option>Mobile</option><option>Autre</option></select></div>
+        <div><label for="gameGenre">Genre</label><select id="gameGenre"><option>Compétitif</option><option>FPS</option><option>Sport</option><option>Simulation</option><option>Aventure</option><option>Autre</option></select></div>
+      </div>
+      <button class="primary" style="margin-top:14px" type="submit">+ Ajouter le jeu · +10 XP</button>
+    </form>
+  </div>
+  <div class="section-head"><h2>Mes jeux</h2><span class="pill" id="libraryCount">0 jeu</span></div>
+  <div id="gameList" class="item-list"></div>
+</section>
+
+<section class="page" id="page-goals">
+  <div class="eyebrow">Progression personnelle</div><h1>🎯 Mes objectifs</h1>
+  <p class="muted">Fixe-toi des objectifs gaming et fais-les avancer étape par étape.</p>
+  <div class="card">
+    <h2>Créer un objectif</h2>
+    <form id="goalForm">
+      <label for="goalName">Mon objectif</label><input id="goalName" required maxlength="100" placeholder="Ex. Améliorer ma précision sur Fortnite">
+      <label for="goalCategory">Catégorie</label><select id="goalCategory"><option>Gaming</option><option>Compétition</option><option>Entraînement</option><option>Création de contenu</option><option>Autre</option></select>
+      <button class="primary" style="margin-top:14px" type="submit">Créer l'objectif · +10 XP</button>
+    </form>
+  </div>
+  <div class="section-head"><h2>En cours</h2></div><div id="activeGoals" class="item-list"></div>
+  <div class="section-head"><h2>Terminés</h2></div><div id="completedGoals" class="item-list"></div>
+</section>
+
+<section class="page" id="page-trophies">
+  <div class="eyebrow">Tes accomplissements</div><h1>🏆 Trophées et succès</h1>
+  <p class="muted">Débloque des trophées grâce à tes actions dans le HUB.</p>
+  <div class="grid">
+    <div class="card"><div class="stat-label">Débloqués</div><div class="stat" id="trophyUnlockedCount">0</div></div>
+    <div class="card"><div class="stat-label">Disponibles</div><div class="stat" id="trophyTotalCount">8</div></div>
+    <div class="card"><div class="stat-label">XP disponibles à travers les trophées</div><div class="stat">320</div></div>
+  </div>
+  <div class="section-head"><h2>Ma collection</h2></div><div id="trophyList" class="grid"></div>
+</section>
+
+<section class="page" id="page-shop">
+  <div class="hero">
+    <div class="eyebrow">VICPOWERS REWARDS</div><h1>🛒 Boutique des récompenses</h1>
+    <p class="hero-copy">Personnalise ton profil avec tes pièces gagnées grâce à tes actions et à ton XP.</p>
+    <div class="coins" style="display:inline-block">🪙 Solde : <span id="shopCoins">0</span> pièces</div>
+  </div>
+  <div class="two">
+    <div class="card"><h3>🎮 Récompenses d'actions</h3><p class="muted">Ajouter des jeux, créer des objectifs, progresser et terminer des objectifs rapporte des pièces.</p></div>
+    <div class="card"><h3>⚡ Bonus d'XP</h3><p class="muted">Chaque gain d'XP accorde aussi des pièces bonus selon le montant gagné.</p></div>
+  </div>
+  <div class="section-head"><h2>✨ Avatars</h2></div><div class="reward-grid" id="avatarShop"></div>
+  <div class="section-head"><h2>💎 Titres</h2></div><div class="reward-grid" id="titleShop"></div>
+  <div class="section-head"><h2>🖼️ Cadres</h2></div><div class="reward-grid" id="frameShop"></div>
+  <div class="section-head"><h2>📦 Mes récompenses</h2></div><div id="ownedShopItems" class="item-list"></div>
+</section>
+
+<section class="page" id="page-history">
+  <div class="eyebrow">Journal de ton compte</div><h1>📜 Mon historique</h1>
+  <p class="muted">Retrouve tes nouveaux gains, dépenses, achats et trophées.</p>
+  <div class="grid">
+    <div class="card"><div class="stat-label">🪙 Pièces gagnées</div><div class="stat" id="historyEarned">0</div></div>
+    <div class="card"><div class="stat-label">🛒 Pièces dépensées</div><div class="stat" id="historySpent">0</div></div>
+    <div class="card"><div class="stat-label">⚡ XP gagnée</div><div class="stat" id="historyXP">0</div></div>
+  </div>
+  <div class="section-head"><h2>Filtrer les activités</h2></div>
+  <div class="filter-row" id="historyFilters">
+    <button class="filter-btn active" data-filter="all" onclick="setHistoryFilter('all')">Tout</button>
+    <button class="filter-btn" data-filter="coins" onclick="setHistoryFilter('coins')">🪙 Pièces</button>
+    <button class="filter-btn" data-filter="xp" onclick="setHistoryFilter('xp')">⚡ XP</button>
+    <button class="filter-btn" data-filter="shop" onclick="setHistoryFilter('shop')">🛒 Boutique</button>
+    <button class="filter-btn" data-filter="trophy" onclick="setHistoryFilter('trophy')">🏆 Trophées</button>
+    <button class="filter-btn" data-filter="other" onclick="setHistoryFilter('other')">🎮 Autres</button>
+  </div>
+  <div class="section-head"><h2>Journal d'activité</h2><span class="pill" id="historyCount">0 activité</span></div>
+  <div id="historyList" class="item-list"></div>
+  <p class="muted" style="font-size:12px;margin-top:16px">Le journal conserve jusqu'aux 500 activités les plus récentes. Les anciennes opérations non enregistrées ne peuvent pas être reconstituées.</p>
+</section>
+
+<section class="page" id="page-profile">
+  <div class="eyebrow">Identité gaming</div><h1>👤 Mon profil gamer</h1>
+  <div class="card" style="margin:18px 0">
+    <div class="profile-top">
+      <div class="avatar" id="profileAvatar">🎮</div>
+      <div style="flex:1;min-width:180px">
+        <h2 id="profileName" style="margin-bottom:4px">V1CTOR</h2><div class="profile-title" id="profileTitle">Joueur compétitif</div>
+        <p class="muted" id="profileBio">Bienvenue sur mon profil gaming !</p>
+        <div class="badge-row"><span class="pill" id="profileRank">Rang Recrue</span><span class="pill" id="profileLevel">Niveau 1</span></div>
+      </div>
+    </div>
+    <hr>
+    <div class="grid">
+      <div><small>XP totale</small><div class="stat" id="profileXP">0</div></div>
+      <div><small>Pièces</small><div class="stat" id="profileCoins">0</div></div>
+      <div><small>Trophées</small><div class="stat" id="profileTrophies">0</div></div>
+    </div>
+    <div class="section-head"><h3>Récompenses équipées</h3></div><div id="featuredRewards" class="badge-row"></div>
+  </div>
+  <div class="card">
+    <h2>Personnaliser mon profil</h2>
+    <form id="profileForm">
+      <label for="profileNameInput">Pseudo</label><input id="profileNameInput" maxlength="30" placeholder="V1CTOR">
+      <label for="profileBioInput">Bio</label><textarea id="profileBioInput" maxlength="180" placeholder="Quelques mots sur toi..."></textarea>
+      <label for="avatarSelect">Avatar</label><select id="avatarSelect"></select>
+      <label for="titleSelect">Titre</label><select id="titleSelect"></select>
+      <label for="frameSelect">Cadre</label><select id="frameSelect"></select>
+      <button class="primary" style="margin-top:14px" type="submit">Enregistrer mon profil</button>
+    </form>
+  </div>
+</section>
+</main>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+"use strict";
+
+/* Les clés de sauvegarde des versions précédentes sont conservées. */
+const KEYS={
+ library:"v1ctorHubLibrary",
+ profile:"v1ctorHubProfil",
+ achievements:"v1ctorHubAchievements",
+ trophies:"v1ctorHubTrophies",
+ coins:"v1ctorHubCoins",
+ shop:"v1ctorHubShopItems",
+ history:"v1ctorHubHistory"
+};
+function readStore(key,fallback){
+ try{const v=localStorage.getItem(key);return v===null?fallback:JSON.parse(v)}
+ catch(e){console.warn("Sauvegarde illisible :",key,e);return fallback}
+}
+function saveStore(key,value){localStorage.setItem(key,JSON.stringify(value))}
+function makeId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function escapeHTML(value){
+ return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+let library=readStore(KEYS.library,[]);
+let profile=readStore(KEYS.profile,{});
+let achievements=readStore(KEYS.achievements,{});
+let trophies=readStore(KEYS.trophies,{});
+let coins=readStore(KEYS.coins,0);
+let shopOwned=readStore(KEYS.shop,[]);
+let history=readStore(KEYS.history,[]);
+let historyFilter="all";
+if(!Array.isArray(library))library=[];
+if(!profile||typeof profile!=="object"||Array.isArray(profile))profile={};
+if(!achievements||typeof achievements!=="object")achievements={};
+if(!trophies||typeof trophies!=="object")trophies={};
+if(!Array.isArray(shopOwned))shopOwned=[];
+if(!Array.isArray(history))history=[];
+coins=Number.isFinite(Number(coins))?Math.max(0,Math.floor(Number(coins))):0;
+if(!Array.isArray(profile.goals))profile.goals=[];
+if(!Number.isFinite(Number(profile.xp)))profile.xp=0;
+profile.xp=Math.max(0,Math.floor(Number(profile.xp)));
+if(!profile.name)profile.name=profile.pseudo||"V1CTOR";
+if(!profile.bio)profile.bio="Bienvenue sur mon profil gaming !";
+if(!profile.avatar)profile.avatar="🎮";
+if(!profile.title)profile.title="Joueur compétitif";
+if(!profile.frame)profile.frame="default";
+
+function logEvent(type,title,detail,amount){
+ history.unshift({id:makeId(),type,title:String(title),detail:String(detail||""),amount:Number(amount)||0,date:new Date().toISOString()});
+ if(history.length>500)history=history.slice(0,500);
+ saveStore(KEYS.history,history);
+}
+function persistAll(){
+ saveStore(KEYS.library,library);saveStore(KEYS.profile,profile);
+ saveStore(KEYS.achievements,achievements);saveStore(KEYS.trophies,trophies);
+ saveStore(KEYS.coins,coins);saveStore(KEYS.shop,shopOwned);saveStore(KEYS.history,history);
+}
+function notify(message){
+ const el=document.getElementById("toast");el.textContent=message;el.classList.remove("hidden");
+ clearTimeout(notify.timer);notify.timer=setTimeout(()=>el.classList.add("hidden"),2800);
+}
+function showPage(page){
+ document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
+ document.querySelectorAll(".navbtn").forEach(el=>el.classList.toggle("active",el.dataset.page===page));
+ const section=document.getElementById("page-"+page);if(section)section.classList.add("active");
+ renderAll();window.scrollTo({top:0,behavior:"smooth"});
+}
+function getLevel(xp){
+ let level=1,remaining=Math.max(0,Number(xp)||0),needed=100;
+ while(remaining>=needed&&level<1000){remaining-=needed;level++;needed=100+25*(level-1)}
+ return{level,into:remaining,needed,progress:Math.min(100,remaining/needed*100)};
+}
+function getRank(level){
+ if(level>=50)return"Légende";if(level>=35)return"Élite";if(level>=25)return"Maître";
+ if(level>=18)return"Diamant";if(level>=12)return"Platine";if(level>=8)return"Or";
+ if(level>=5)return"Argent";if(level>=3)return"Bronze";return"Recrue";
+}
+const TROPHY_DEFS=[
+ {id:"firstGame",name:"Premier jeu",icon:"🎮",desc:"Ajoute ton premier jeu.",xp:20,check:()=>library.length>=1},
+ {id:"firstFavorite",name:"Coup de cœur",icon:"❤️",desc:"Ajoute ton premier jeu aux favoris.",xp:20,check:()=>library.some(g=>g.favorite)},
+ {id:"firstGoal",name:"Cap sur l'objectif",icon:"🎯",desc:"Crée ton premier objectif.",xp:20,check:()=>profile.goals.length>=1},
+ {id:"firstComplete",name:"Mission accomplie",icon:"✅",desc:"Termine ton premier objectif.",xp:30,check:()=>profile.goals.some(g=>g.completed)},
+ {id:"xp100",name:"Première centaine",icon:"⚡",desc:"Atteins 100 XP.",xp:30,check:()=>profile.xp>=100},
+ {id:"level5",name:"En progression",icon:"🚀",desc:"Atteins le niveau 5.",xp:40,check:()=>getLevel(profile.xp).level>=5},
+ {id:"level10",name:"Joueur confirmé",icon:"💎",desc:"Atteins le niveau 10.",xp:60,check:()=>getLevel(profile.xp).level>=10},
+ {id:"tenGoals",name:"Machine à objectifs",icon:"🏆",desc:"Termine 10 objectifs.",xp:100,check:()=>profile.goals.filter(g=>g.completed).length>=10}
+];
+const SHOP_ITEMS=[
+ {id:"avatar_cyan",category:"avatar",name:"Neon Cyan",icon:"🔷",price:60,desc:"Un avatar bleu électrique."},
+ {id:"avatar_fire",category:"avatar",name:"Flamme",icon:"🔥",price:90,desc:"Un avatar qui met le feu."},
+ {id:"avatar_crown",category:"avatar",name:"Roi du gaming",icon:"👑",price:150,desc:"Une couronne pour ton profil."},
+ {id:"avatar_alien",category:"avatar",name:"Alien gamer",icon:"👾",price:120,desc:"Un look venu d'ailleurs."},
+ {id:"title_pro",category:"title",name:"Pro Player",icon:"🎯",price:80,desc:"Un titre pour ton profil."},
+ {id:"title_sniper",category:"title",name:"Sniper",icon:"🎯",price:100,desc:"Précision et sang-froid."},
+ {id:"title_legend",category:"title",name:"Légende",icon:"👑",price:200,desc:"Un titre prestigieux."},
+ {id:"title_champion",category:"title",name:"Champion",icon:"🏆",price:140,desc:"Montre ton esprit de compétition."},
+ {id:"frame_blue",category:"frame",name:"Cadre Électrique",icon:"🖼️",price:70,desc:"Un cadre bleu lumineux."},
+ {id:"frame_gold",category:"frame",name:"Cadre Doré",icon:"🌟",price:130,desc:"Un cadre doré prestigieux."},
+ {id:"frame_diamond",category:"frame",name:"Cadre Diamant",icon:"💠",price:180,desc:"Un cadre de rang supérieur."}
+];
+function getItem(id){return SHOP_ITEMS.find(item=>item.id===id)}
+function owns(id){return shopOwned.includes(id)}
+function countUnlockedTrophies(){return TROPHY_DEFS.filter(t=>trophies[t.id]).length}
+function formatDate(date){
+ const d=new Date(date);if(Number.isNaN(d.getTime()))return"Date inconnue";
+ return d.toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"});
+}
+function eventIcon(type){return({coins:"🪙",xp:"⚡",shop:"🛒",trophy:"🏆",other:"🎮",equip:"✨"})[type]||"📌"}
+
+function addCoins(amount,reason){
+ amount=Math.max(0,Math.floor(Number(amount)||0));if(!amount)return;
+ coins+=amount;
+ logEvent("coins","Pièces gagnées","+"+amount+" pièces"+(reason?" · "+reason:""),amount);
+ persistAll();notify("🪙 +"+amount+" pièces"+(reason?" — "+reason:""));
+}
+function addXP(amount,reason){
+ amount=Math.max(0,Math.floor(Number(amount)||0));if(!amount)return;
+ const oldLevel=getLevel(profile.xp).level;profile.xp+=amount;
+ logEvent("xp","XP gagnée","+"+amount+" XP"+(reason?" · "+reason:""),amount);
+ const bonus=Math.floor(amount/5);
+ if(bonus){coins+=bonus;logEvent("coins","Bonus de pièces lié à l'XP","+"+bonus+" pièces pour "+amount+" XP",bonus)}
+ persistAll();
+ const newLevel=getLevel(profile.xp).level;
+ notify("⚡ +"+amount+" XP"+(bonus?" et +"+bonus+" pièces":"")+(reason?" — "+reason:""));
+ if(newLevel>oldLevel){logEvent("other","Niveau supérieur","Tu atteins le niveau "+newLevel,newLevel);persistAll();setTimeout(()=>notify("🎉 Niveau supérieur ! Niveau "+newLevel),450)}
+ checkTrophies();renderAll();
+}
+function checkTrophies(){
+ let changed=false;
+ TROPHY_DEFS.forEach(t=>{
+  if(!trophies[t.id]&&t.check()){
+   trophies[t.id]={unlocked:true,date:new Date().toISOString()};
+   profile.xp+=t.xp;
+   logEvent("trophy","Trophée débloqué : "+t.name,t.desc,t.xp);
+   logEvent("xp","Récompense de trophée","+"+t.xp+" XP · "+t.name,t.xp);
+   const bonus=Math.floor(t.xp/5);
+   if(bonus){coins+=bonus;logEvent("coins","Bonus d'XP de trophée","+"+bonus+" pièces · "+t.name,bonus)}
+   changed=true;setTimeout(()=>notify("🏆 Trophée : "+t.name+" (+"+t.xp+" XP)"),350);
+  }
+ });
+ if(changed)persistAll();
+}
+
+/* Accueil premium : les chiffres proviennent des sauvegardes actuelles. */
+function renderHome(){
+ const lv=getLevel(profile.xp),done=profile.goals.filter(g=>g.completed).length;
+ const active=profile.goals.length-done,unlocked=countUnlockedTrophies();
+ document.getElementById("welcomeName").textContent=profile.name;
+ document.getElementById("homeRank").textContent="✦ Rang "+getRank(lv.level);
+ document.getElementById("homeLevel").textContent="Niveau "+lv.level;
+ document.getElementById("xpText").textContent=lv.into+" / "+lv.needed+" XP";
+ document.getElementById("xpBar").style.width=lv.progress+"%";
+ document.getElementById("xpRemaining").textContent="Encore "+(lv.needed-lv.into)+" XP pour le niveau suivant";
+ document.getElementById("heroLevelNumber").textContent=lv.level;
+ document.getElementById("statGames").textContent=library.length;
+ document.getElementById("statGamesNote").textContent=library.filter(g=>g.favorite).length+" favori(s)";
+ document.getElementById("statGoals").textContent=done;
+ document.getElementById("statGoalsNote").textContent=active+" objectif(s) en cours";
+ document.getElementById("statTrophies").textContent=unlocked+"/"+TROPHY_DEFS.length;
+ document.getElementById("homeTrophyProgress").textContent=unlocked+"/"+TROPHY_DEFS.length;
+ document.getElementById("homeTrophyBar").style.width=(unlocked/TROPHY_DEFS.length*100)+"%";
+ document.getElementById("homeRankCard").textContent=getRank(lv.level);
+ document.getElementById("homeXPNumber").textContent=profile.xp;
+ document.getElementById("homeRankTip").textContent=lv.level<5?"Encore "+Math.max(0,5-lv.level)+" niveau(x) avant le rang Argent.":"Continue tes objectifs pour atteindre le rang suivant.";
+ const games=[...library].slice(-4).reverse();
+ document.getElementById("recentGames").innerHTML=games.length?games.map(g=>`
+ <div class="list-item"><div class="activity"><div class="activity-icon">${g.favorite?"❤️":"🎮"}</div><div class="item-info"><strong>${escapeHTML(g.name||g.title||"Jeu sans nom")}</strong><br><small>${escapeHTML(g.platform||"Plateforme inconnue")} · ${escapeHTML(g.genre||"Jeu")}</small></div></div><button class="secondary mini" onclick="showPage('library')">Ouvrir ↗</button></div>`).join(""):'<div class="empty">Ta bibliothèque est vide.<br>Ajoute ton premier jeu pour commencer !</div>';
+ document.getElementById("homeHistory").innerHTML=history.length?history.slice(0,4).map(renderHistoryEntry).join(""):'<div class="empty">Tes nouvelles activités apparaîtront ici.</div>';
+}
+function renderLibrary(){
+ document.getElementById("libraryCount").textContent=library.length+" jeu"+(library.length>1?"x":"");
+ const list=document.getElementById("gameList");
+ if(!library.length){list.innerHTML='<div class="empty">Aucun jeu pour le moment. Ajoute ton premier jeu !</div>';return}
+ list.innerHTML=library.map((g,i)=>`
+ <div class="list-item"><div class="item-info"><strong>${g.favorite?"❤️ ":"🎮 "}${escapeHTML(g.name||g.title||"Jeu sans nom")}</strong><br><small>${escapeHTML(g.platform||"Plateforme inconnue")} · ${escapeHTML(g.genre||"Jeu")}</small></div>
+ <div class="item-actions"><button class="secondary mini" onclick="toggleFavorite(${i})">${g.favorite?"Retirer favori":"❤️ Favori"}</button><button class="danger mini" onclick="removeGame(${i})">Supprimer</button></div></div>`).join("");
+}
+function renderGoals(){
+ const active=profile.goals.filter(g=>!g.completed),done=profile.goals.filter(g=>g.completed);
+ document.getElementById("activeGoals").innerHTML=active.length?active.map(g=>`
+ <div class="list-item"><div class="item-info"><strong>🎯 ${escapeHTML(g.name||g.title||"Objectif")}</strong><br><small>${escapeHTML(g.category||"Gaming")} · Progression : ${Number(g.progress)||0}%</small><div class="bar"><span style="width:${Math.min(100,Math.max(0,Number(g.progress)||0))}%"></span></div></div>
+ <div class="item-actions"><button class="secondary mini" onclick="advanceGoal('${g.id}')">+ Avancer</button><button class="primary mini" onclick="completeGoal('${g.id}')">Terminer</button><button class="danger mini" onclick="deleteGoal('${g.id}')">Supprimer</button></div></div>`).join(""):'<div class="empty">Aucun objectif en cours. Crée ton premier objectif !</div>';
+ document.getElementById("completedGoals").innerHTML=done.length?done.map(g=>`
+ <div class="list-item"><div class="item-info"><strong>✅ ${escapeHTML(g.name||g.title||"Objectif")}</strong><br><small>Objectif terminé</small></div><button class="danger mini" onclick="deleteGoal('${g.id}')">Supprimer</button></div>`).join(""):'<div class="empty">Tes objectifs terminés apparaîtront ici.</div>';
+}
+function renderTrophies(){
+ document.getElementById("trophyUnlockedCount").textContent=countUnlockedTrophies();
+ document.getElementById("trophyTotalCount").textContent=TROPHY_DEFS.length;
+ document.getElementById("trophyList").innerHTML=TROPHY_DEFS.map(t=>{
+ const unlocked=!!trophies[t.id];
+ return `<div class="card trophy ${unlocked?"":"locked"}"><div class="trophy-icon">${t.icon}</div><div><h3>${escapeHTML(t.name)}</h3><p class="muted" style="font-size:13px">${escapeHTML(t.desc)}</p><span class="pill">${unlocked?"Débloqué":"Verrouillé"} · ${t.xp} XP</span></div></div>`;
+ }).join("");
+}
+function renderShop(){
+ document.getElementById("shopCoins").textContent=coins;
+ const categories={avatar:"avatarShop",title:"titleShop",frame:"frameShop"};
+ Object.entries(categories).forEach(([category,containerId])=>{
+  document.getElementById(containerId).innerHTML=SHOP_ITEMS.filter(x=>x.category===category).map(item=>{
+   const owned=owns(item.id);
+   const equipped=(category==="avatar"&&profile.avatarItem===item.id)||(category==="title"&&profile.titleItem===item.id)||(category==="frame"&&profile.frameItem===item.id);
+   return `<div class="card reward ${owned?"owned":""} ${equipped?"equipped":""}">
+   <div class="reward-icon">${item.icon}</div><h3>${escapeHTML(item.name)}</h3><div class="description">${escapeHTML(item.desc)}</div><div class="price">🪙 ${item.price} pièces</div>
+   ${owned?`<span class="pill">${equipped?"Équipé":"Possédé"}</span><button class="${equipped?"secondary":"primary"}" onclick="equipItem('${item.id}')">${equipped?"Déjà équipé":"Équiper"}</button>`:`<button class="primary" ${coins<item.price?"disabled":""} onclick="buyItem('${item.id}')">${coins<item.price?"Pièces insuffisantes":"Acheter"}</button>`}
+   </div>`;
+  }).join("");
+ });
+ const owned=shopOwned.map(getItem).filter(Boolean);
+ document.getElementById("ownedShopItems").innerHTML=owned.length?owned.map(item=>{
+ const equipped=(item.category==="avatar"&&profile.avatarItem===item.id)||(item.category==="title"&&profile.titleItem===item.id)||(item.category==="frame"&&profile.frameItem===item.id);
+ return `<div class="list-item"><div class="item-info"><strong>${item.icon} ${escapeHTML(item.name)}</strong><br><small>${escapeHTML(item.desc)}</small></div><button class="secondary mini" onclick="equipItem('${item.id}')">${equipped?"Équipé":"Équiper"}</button></div>`;
+ }).join(""):'<div class="empty">Tu n’as pas encore de récompense. Gagne des pièces pour commencer !</div>';
+}
+function renderProfile(){
+ const lv=getLevel(profile.xp),avatarItem=getItem(profile.avatarItem),titleItem=getItem(profile.titleItem),frameItem=getItem(profile.frameItem);
+ document.getElementById("profileName").textContent=profile.name;
+ document.getElementById("profileTitle").textContent=titleItem?titleItem.name:profile.title;
+ document.getElementById("profileBio").textContent=profile.bio;
+ const av=document.getElementById("profileAvatar");
+ av.textContent=avatarItem?avatarItem.icon:(profile.avatar||"🎮");
+ av.style.borderColor=frameItem?(frameItem.id==="frame_gold"?"#ffd166":frameItem.id==="frame_diamond"?"#8cecff":"#43d9ff"):"#43d9ff";
+ av.style.boxShadow=frameItem?"0 0 18px "+(frameItem.id==="frame_gold"?"#ffd16655":frameItem.id==="frame_diamond"?"#8cecff55":"#43d9ff55"):"none";
+ document.getElementById("profileRank").textContent="Rang "+getRank(lv.level);
+ document.getElementById("profileLevel").textContent="Niveau "+lv.level;
+ document.getElementById("profileXP").textContent=profile.xp;
+ document.getElementById("profileCoins").textContent=coins;
+ document.getElementById("profileTrophies").textContent=countUnlockedTrophies();
+ document.getElementById("profileNameInput").value=profile.name;
+ document.getElementById("profileBioInput").value=profile.bio;
+ document.getElementById("avatarSelect").innerHTML='<option value="default">🎮 Avatar classique</option>'+SHOP_ITEMS.filter(x=>x.category==="avatar"&&owns(x.id)).map(x=>`<option value="${x.id}">${x.icon} ${escapeHTML(x.name)}</option>`).join("");
+ document.getElementById("titleSelect").innerHTML='<option value="default">Joueur compétitif</option>'+SHOP_ITEMS.filter(x=>x.category==="title"&&owns(x.id)).map(x=>`<option value="${x.id}">${x.icon} ${escapeHTML(x.name)}</option>`).join("");
+ document.getElementById("frameSelect").innerHTML='<option value="default">Cadre classique</option>'+SHOP_ITEMS.filter(x=>x.category==="frame"&&owns(x.id)).map(x=>`<option value="${x.id}">${x.icon} ${escapeHTML(x.name)}</option>`).join("");
+ document.getElementById("avatarSelect").value=owns(profile.avatarItem)?profile.avatarItem:"default";
+ document.getElementById("titleSelect").value=owns(profile.titleItem)?profile.titleItem:"default";
+ document.getElementById("frameSelect").value=owns(profile.frameItem)?profile.frameItem:"default";
+ const featured=[avatarItem,titleItem,frameItem].filter(Boolean);
+ document.getElementById("featuredRewards").innerHTML=featured.length?featured.map(x=>`<span class="pill">${x.icon} ${escapeHTML(x.name)}</span>`).join(""):'<span class="muted">Équipe tes premières récompenses depuis la boutique.</span>';
+}
+function renderHistoryEntry(entry){
+ const amount=Number(entry.amount)||0;let amountText="",amountClass="";
+ if(entry.type==="coins"){amountText=(amount>=0?"+":"")+amount+" pièces";amountClass=amount>=0?"positive":"negative"}
+ else if(entry.type==="xp"){amountText="+"+amount+" XP";amountClass="positive"}
+ else if(entry.type==="shop"){amountText=amount<0?amount+" pièces":"";amountClass="negative"}
+ else if(entry.type==="trophy"&&amount>0){amountText="+"+amount+" XP";amountClass="positive"}
+ return `<div class="list-item history-row"><div class="history-icon">${eventIcon(entry.type)}</div><div class="item-info"><div class="history-title">${escapeHTML(entry.title)}</div><div class="history-detail">${escapeHTML(entry.detail)} · ${formatDate(entry.date)}</div></div><div class="history-amount ${amountClass}">${escapeHTML(amountText)}</div></div>`;
+}
+function renderHistory(){
+ const earned=history.filter(e=>e.type==="coins"&&e.amount>0).reduce((s,e)=>s+e.amount,0);
+ const spent=history.filter(e=>e.type==="shop"&&e.amount<0).reduce((s,e)=>s+Math.abs(e.amount),0);
+ const xp=history.filter(e=>e.type==="xp").reduce((s,e)=>s+Math.max(0,e.amount),0);
+ document.getElementById("historyEarned").textContent=earned;
+ document.getElementById("historySpent").textContent=spent;
+ document.getElementById("historyXP").textContent=xp;
+ document.querySelectorAll("[data-filter]").forEach(b=>b.classList.toggle("active",b.dataset.filter===historyFilter));
+ const filtered=history.filter(e=>{
+  if(historyFilter==="all")return true;if(historyFilter==="coins")return e.type==="coins";
+  if(historyFilter==="xp")return e.type==="xp";if(historyFilter==="shop")return e.type==="shop"||e.type==="equip";
+  if(historyFilter==="trophy")return e.type==="trophy";if(historyFilter==="other")return e.type==="other";return true;
+ });
+ document.getElementById("historyCount").textContent=filtered.length+" activité"+(filtered.length>1?"s":"");
+ document.getElementById("historyList").innerHTML=filtered.length?filtered.map(renderHistoryEntry).join(""):'<div class="empty">Aucune activité dans cette catégorie pour le moment.</div>';
+}
+function renderAll(){
+ document.getElementById("headerCoins").textContent=coins;
+ renderHome();renderLibrary();renderGoals();renderTrophies();renderShop();renderProfile();renderHistory();
+}
+function setHistoryFilter(filter){historyFilter=filter;renderHistory()}
+
+function buyItem(id){
+ const item=getItem(id);if(!item)return;
+ if(owns(id)){notify("Tu possèdes déjà cette récompense.");return}
+ if(coins<item.price){notify("Pas assez de pièces pour cet achat.");return}
+ coins-=item.price;shopOwned.push(id);
+ logEvent("shop","Achat : "+item.name,"-"+item.price+" pièces · "+item.category,-item.price);
+ persistAll();renderAll();notify("🎉 Achat réussi : "+item.name+" !");
+}
+function equipItem(id){
+ const item=getItem(id);if(!item||!owns(id)){notify("Tu dois posséder cette récompense.");return}
+ if(item.category==="avatar")profile.avatarItem=id;
+ if(item.category==="title")profile.titleItem=id;
+ if(item.category==="frame")profile.frameItem=id;
+ logEvent("equip","Récompense équipée : "+item.name,"Catégorie : "+item.category,0);
+ persistAll();renderAll();notify("✨ "+item.name+" équipé !");
+}
+function toggleFavorite(index){
+ const game=library[index];if(!game)return;
+ const firstFavorite=!library.some(g=>g.favorite);game.favorite=!game.favorite;
+ persistAll();
+ if(game.favorite){
+  logEvent("other","Jeu ajouté aux favoris",game.name||game.title||"Jeu",0);
+  addCoins(5,"jeu ajouté aux favoris");addXP(5,"favori ajouté");
+  if(firstFavorite)checkTrophies();
+ }else{
+  logEvent("other","Jeu retiré des favoris",game.name||game.title||"Jeu",0);
+  persistAll();renderAll();
+ }
+}
+function removeGame(index){
+ if(!library[index]||!confirm("Supprimer ce jeu de ta bibliothèque ?"))return;
+ const removed=library[index];library.splice(index,1);
+ logEvent("other","Jeu supprimé",removed.name||removed.title||"Jeu",0);
+ persistAll();renderAll();notify("Jeu supprimé.");
+}
+function advanceGoal(id){
+ const goal=profile.goals.find(g=>g.id===id);if(!goal||goal.completed)return;
+ goal.progress=Math.min(100,(Number(goal.progress)||0)+25);
+ logEvent("other","Objectif avancé",goal.name+" · "+goal.progress+"%",0);
+ persistAll();addCoins(3,"objectif avancé");addXP(5,"progression");
+}
+function completeGoal(id){
+ const goal=profile.goals.find(g=>g.id===id);if(!goal||goal.completed)return;
+ goal.completed=true;goal.progress=100;
+ logEvent("other","Objectif terminé",goal.name,0);
+ persistAll();addCoins(15,"objectif terminé");addXP(20,"objectif terminé");checkTrophies();renderAll();
+}
+function deleteGoal(id){
+ if(!confirm("Supprimer cet objectif ?"))return;
+ const goal=profile.goals.find(g=>g.id===id);
+ profile.goals=profile.goals.filter(g=>g.id!==id);
+ if(goal)logEvent("other","Objectif supprimé",goal.name,0);
+ persistAll();renderAll();notify("Objectif supprimé.");
+}
+
+document.getElementById("gameForm").addEventListener("submit",event=>{
+ event.preventDefault();
+ const name=document.getElementById("gameName").value.trim();if(!name)return;
+ library.push({id:makeId(),name,platform:document.getElementById("gamePlatform").value,genre:document.getElementById("gameGenre").value,favorite:false,date:new Date().toISOString()});
+ logEvent("other","Jeu ajouté à la bibliothèque",name,0);
+ document.getElementById("gameForm").reset();persistAll();
+ addCoins(5,"nouveau jeu ajouté");addXP(10,"jeu ajouté");checkTrophies();renderAll();
+});
+document.getElementById("goalForm").addEventListener("submit",event=>{
+ event.preventDefault();
+ const name=document.getElementById("goalName").value.trim();if(!name)return;
+ profile.goals.push({id:makeId(),name,category:document.getElementById("goalCategory").value,completed:false,progress:0,date:new Date().toISOString()});
+ logEvent("other","Nouvel objectif créé",name,0);
+ document.getElementById("goalForm").reset();persistAll();
+ addCoins(5,"nouvel objectif créé");addXP(10,"objectif créé");checkTrophies();renderAll();
+});
+document.getElementById("profileForm").addEventListener("submit",event=>{
+ event.preventDefault();
+ profile.name=document.getElementById("profileNameInput").value.trim()||"V1CTOR";
+ profile.bio=document.getElementById("profileBioInput").value.trim()||"Bienvenue sur mon profil gaming !";
+ const avatar=document.getElementById("avatarSelect").value;
+ const title=document.getElementById("titleSelect").value;
+ const frame=document.getElementById("frameSelect").value;
+ profile.avatarItem=avatar==="default"?"":avatar;
+ profile.titleItem=title==="default"?"":title;
+ profile.frameItem=frame==="default"?"":frame;
+ const av=getItem(profile.avatarItem),ti=getItem(profile.titleItem);
+ profile.avatar=av?av.icon:"🎮";profile.title=ti?ti.name:"Joueur compétitif";
+ logEvent("other","Profil mis à jour","Pseudo : "+profile.name,0);
+ persistAll();renderAll();notify("Profil enregistré !");
+});
+
+/* Initialise l'affichage sans effacer les données existantes. */
+checkTrophies();
+persistAll();
+renderAll();
+</script>
+</body>
+</html>
